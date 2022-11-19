@@ -1,0 +1,207 @@
+---
+# Copyright (C) 2022 Leandro Lisboa Penz <lpenz@lpenz.org>
+# This file is subject to the terms and conditions defined in
+# file 'LICENSE', which is part of this source code package.
+name: python
+on:
+  workflow_call:
+    inputs:
+      coveralls:
+        description: |
+          Upload test coverage data to coveralls.io when true.
+        required: false
+        type: boolean
+        default: false
+      deb:
+        description: Enables python-stdeb when true.
+        required: false
+        type: boolean
+        default: false
+      dependencies_debian:
+        description: |
+          Dependencies as Debian packages to install; used in the
+          appropriate actions if defined
+        type: string
+      publish_pypi:
+        description: Enables the publish-pypi job.
+        required: false
+        type: boolean
+        default: true
+      publish_github_release:
+        description: Enables the publish-github-release job.
+        required: false
+        type: boolean
+        default: true
+      publish_github_release_files:
+        description: Files to publish in the github release.
+        required: false
+        type: string
+        default: ''
+      publish_packagecloud:
+        description: Enables the publish-packagecloud job.
+        required: false
+        type: boolean
+        default: false
+      publish_packagecloud_repository:
+        description: packagecloud repository to publish .deb.
+        required: false
+        type: string
+        default: ''
+    secrets:
+      PYPI_TOKEN:
+        required: false
+      PACKAGECLOUD_TOKEN:
+        required: false
+jobs:
+  black:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - uses: piotrpawlaczek/python-blacken@v22.3.0
+  install:
+    strategy:
+      matrix:
+        python-version:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+        include:
+          - python-version: "3.11"
+            upload: true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - uses: actions/setup-python@v4.3.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install build twine --user
+      - run: python -m build --sdist --wheel --outdir dist/
+      - run: twine check dist/*
+      - run: python3 -m pip install .
+      - uses: actions/upload-artifact@v3.1.1
+        if: matrix.upload
+        with:
+          name: build
+          path: dist/*
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - run: |
+          docker run --rm -v "${PWD}:${PWD}" -w "$PWD" sphinxdoc/sphinx:5.3.0 make -C docs html
+      - uses: actions/upload-artifact@v3.1.1
+        with:
+          name: docs
+          path: docs/_build/
+  deb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+        if: inputs.deb
+      - id: version
+        if: inputs.deb
+        uses: docker://lpenz/ghaction-version-gen:0.11.0
+      - uses: docker://lpenz/ghaction-python-stdeb:0.3
+        if: inputs.deb
+        with:
+          debian_revision: ${{ steps.version.outputs.distance }}
+      - uses: actions/upload-artifact@v3.1.1
+        if: inputs.deb
+        with:
+          name: deb
+          if-no-files-found: error
+          path: '*.deb'
+  test:
+    strategy:
+      matrix:
+        python-version:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - uses: actions/setup-python@v4.3.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: lpenz/ghaction-pytest-cov@v1
+      - uses: AndreMiras/coveralls-python-action@v20201129
+        with:
+          parallel: true
+          flag-name: python-${{ matrix.python-version }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+  coverage-finish:
+    if: inputs.coveralls
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: AndreMiras/coveralls-python-action@v20201129
+        with:
+          parallel-finished: true
+  publish-packagecloud:
+    needs: [ black, install, docs, deb, test ]
+    if: inputs.publish_packagecloud
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repository: ${{ fromJson(inputs.publish_packagecloud_repository) }}
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - id: version
+        uses: docker://lpenz/ghaction-version-gen:0.11.0
+      - name: download deb
+        uses: actions/download-artifact@v3.0.1
+        if: inputs.deb
+        with:
+          name: deb
+      - name: publish deb on packagecloud
+        uses: docker://lpenz/ghaction-packagecloud:0.4
+        if: steps.version.outputs.version_commit != ''
+        env:
+          PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
+        with:
+          repository: ${{ matrix.repository }}
+  publish-pypi:
+    needs: [ black, install, docs, deb, test ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - id: version
+        uses: docker://lpenz/ghaction-version-gen:0.11.0
+      - run: python -m pip install build --user
+      - run: python -m build --sdist --wheel --outdir dist/
+      - uses: pypa/gh-action-pypi-publish@v1.5.1
+        if: steps.version.outputs.version_tagged != ''
+        with:
+          password: ${{ secrets.PYPI_TOKEN }}
+  publish-github-release:
+    needs: [ black, install, docs, deb, test ]
+    if: inputs.publish_github_release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - id: version
+        uses: docker://lpenz/ghaction-version-gen:0.11.0
+      - name: download deb
+        uses: actions/download-artifact@v3.0.1
+        if: inputs.deb
+        with:
+          name: deb
+          path: deb
+      - name: download build
+        uses: actions/download-artifact@v3.0.1
+        with:
+          name: build
+          path: build
+      - name: list all files
+        run: find . -type f
+      - name: publish github release
+        uses: "marvinpinto/action-automatic-releases@v1.2.1"
+        if: steps.version.outputs.version_tagged != ''
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: false
+          files: |
+            deb/*.deb
+            build/*
+            ${{ inputs.publish_github_release_files }}
