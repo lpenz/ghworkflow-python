@@ -58,6 +58,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3.5.0
       - uses: piotrpawlaczek/python-blacken@v22.3.0
+  flake8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.5.0
+      - uses: actions/setup-python@v4.5.0
+      - uses: py-actions/flake8@v2.2.1
   install:
     strategy:
       matrix:
@@ -139,7 +145,7 @@ jobs:
         with:
           parallel-finished: true
   publish-packagecloud:
-    needs: [ black, install, docs, deb, pytest ]
+    needs: [ black, install, docs, deb, pytest, flake8 ]
     if: inputs.publish_packagecloud
     runs-on: ubuntu-latest
     strategy:
@@ -162,7 +168,7 @@ jobs:
         with:
           repository: ${{ matrix.repository }}
   publish-pypi:
-    needs: [ black, install, docs, deb, pytest ]
+    needs: [ black, install, docs, deb, pytest, flake8 ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.5.0
@@ -175,7 +181,7 @@ jobs:
         with:
           password: ${{ secrets.PYPI_TOKEN }}
   publish-github-release:
-    needs: [ black, install, docs, deb, pytest ]
+    needs: [ black, install, docs, deb, pytest, flake8 ]
     if: inputs.publish_github_release
     runs-on: ubuntu-latest
     steps:
