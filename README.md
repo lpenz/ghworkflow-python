@@ -10,7 +10,8 @@ projects. The workflow runs the following jobs:
 - *deb*: build debian packages using [python-stdeb]
 - *install*: build and checks [wheels] using [twine], and tries to
   install them, all in the latest couple python versions.
-- *test*: runs all tests using [ghaction-pytest-cov] with coverage
+- *flake8*: runs [flake8] static analyser.
+- *pytest*: runs all tests using [ghaction-pytest-cov] with coverage
   enabled, for the latest couple python versions.
 - *[coverage-finish]*: uploads the coverage results to [coveralls.io]
 - *publish-pypi*: uses [pypa/gh-action-pypi-publish] to publish the
@@ -40,7 +41,7 @@ name: CI
 on: [ workflow_dispatch, push, pull_request ]
 jobs:
   python:
-    uses: lpenz/ghworkflow-python/.github/workflows/python.yml@v0.1.0
+    uses: lpenz/ghworkflow-python/.github/workflows/python.yml@v0.2.0
     with:
       coveralls: true
       deb: true
@@ -75,6 +76,7 @@ organization. See [reusing-workflows] for more information.
 
 
 [black]: https://github.com/psf/black
+[flake8]: https://flake8.pycqa.org/en/latest/
 [sphinx]: https://www.sphinx-doc.org/
 [wheels]: https://pythonwheels.com/
 [twine]: https://twine.readthedocs.io/en/stable/
