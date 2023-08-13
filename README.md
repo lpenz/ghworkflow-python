@@ -1,4 +1,5 @@
 [![CI](https://github.com/lpenz/ghworkflow-python/actions/workflows/ci.yml/badge.svg)](https://github.com/lpenz/ghworkflow-python/actions/workflows/ci.yml)
+[![github](https://img.shields.io/github/v/release/lpenz/ghworkflow-python?logo=github)](https://github.com/lpenz/ghworkflow-python/releases)
 
 
 # ghworkflow-python
