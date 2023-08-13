@@ -17,6 +17,11 @@ on:
         required: false
         type: boolean
         default: true
+      docs:
+        description: Enables/disables docs generation with sphinx
+        required: false
+        type: boolean
+        default: true
       deb:
         description: Enables python-stdeb when true.
         required: false
@@ -104,9 +109,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.5.0
+        if: inputs.docs
       - run: |
           docker run --rm -v "${PWD}:${PWD}" -w "$PWD" sphinxdoc/sphinx:5.3.0 make -C docs html
+        if: inputs.docs
       - uses: actions/upload-artifact@v3.1.2
+        if: inputs.docs
         with:
           name: docs
           path: docs/_build/

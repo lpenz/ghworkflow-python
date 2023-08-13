@@ -64,6 +64,7 @@ organization. See [reusing-workflows] for more information.
 ### Inputs
 
 - `mypy`: disables *mypy* when `false`; mypy is enabled by default.
+- `docs`: disables docs job when `false`, which is enabled by default.
 - `deb`: enables *deb* when `true`.
 - `coveralls`: makes the *pytest* job upload test coverage data to
   [coveralls.io] when `true`.
