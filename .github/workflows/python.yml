@@ -22,6 +22,11 @@ on:
           Dependencies as Debian packages to install; used in the
           appropriate actions if defined
         type: string
+      mypy:
+        description: Enables/disables the mypy job
+        required: false
+        type: boolean
+        default: true
       publish_pypi:
         description: Enables the publish-pypi job.
         required: false
@@ -68,9 +73,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.5.0
+        if: inputs.mypy
       - uses: actions/setup-python@v4.5.0
+        if: inputs.mypy
       - run: pip install mypy
+        if: inputs.mypy
       - run: mypy
+        if: inputs.mypy
   install:
     strategy:
       matrix:
@@ -152,7 +161,7 @@ jobs:
         with:
           parallel-finished: true
   publish-packagecloud:
-    needs: [ black, install, docs, deb, pytest, flake8 ]
+    needs: [ black, flake8, mypy, install, docs, deb, pytest ]
     if: inputs.publish_packagecloud
     runs-on: ubuntu-latest
     strategy:
@@ -175,7 +184,7 @@ jobs:
         with:
           repository: ${{ matrix.repository }}
   publish-pypi:
-    needs: [ black, install, docs, deb, pytest, flake8 ]
+    needs: [ black, flake8, mypy, install, docs, deb, pytest ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.5.0
@@ -188,7 +197,7 @@ jobs:
         with:
           password: ${{ secrets.PYPI_TOKEN }}
   publish-github-release:
-    needs: [ black, install, docs, deb, pytest, flake8 ]
+    needs: [ black, flake8, mypy, install, docs, deb, pytest ]
     if: inputs.publish_github_release
     runs-on: ubuntu-latest
     steps:

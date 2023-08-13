@@ -14,7 +14,7 @@ projects. The workflow runs the following jobs:
 - *mypy*: runs the [mypy] optional static typing analyser.
 - *pytest*: runs all tests using [ghaction-pytest-cov] with coverage
   enabled, for the latest couple python versions.
-- *[coverage-finish]*: uploads the coverage results to [coveralls.io]
+- *coverage-finish*: uploads the coverage results to [coveralls.io]
 - *publish-pypi*: uses [pypa/gh-action-pypi-publish] to publish the
   wheels to [pypi] when the repository is tagged with a version.
   Requires the `PYPI_TOKEN` secret.
@@ -42,7 +42,7 @@ name: CI
 on: [ workflow_dispatch, push, pull_request ]
 jobs:
   python:
-    uses: lpenz/ghworkflow-python/.github/workflows/python.yml@v0.3.0
+    uses: lpenz/ghworkflow-python/.github/workflows/python.yml@v0.3.1
     with:
       coveralls: true
       deb: true
@@ -65,8 +65,7 @@ organization. See [reusing-workflows] for more information.
 - `coveralls`: makes *cargo-test* upload test coverage data to
   [coveralls.io] when `true`.
 - `deb`: enables *deb* when `true`.
-- `dependencies_debian`: dependencies as Debian packages to install;
-   used in the appropriate actions if defined
+- `mypy`: disables *mypy* when `false`; mypy is enabled by default.
 - `publish_pypi`: enables the *publish-pypi* job.
 - `publish_github_release`: enables the *publish-github-release* job.
 - `publish_github_release_files`: files to publish in the github
