@@ -7,12 +7,12 @@
 This repository provides a reusable github workflow for python
 projects. The workflow runs the following jobs:
 - *black*: checks code formatting using [black].
-- *docs*: builds docs using [sphinx]
-- *deb*: build debian packages using [python-stdeb]
-- *install*: build and checks [wheels] using [twine], and tries to
-  install them, all in the latest couple python versions.
 - *flake8*: runs the [flake8] static analyser.
 - *mypy*: runs the [mypy] optional static typing analyser.
+- *install*: build and checks [wheels] using [twine], and tries to
+  install them, all in the latest couple python versions.
+- *docs*: builds docs using [sphinx]
+- *deb*: build debian packages using [python-stdeb]
 - *pytest*: runs all tests using [ghaction-pytest-cov] with coverage
   enabled, for the latest couple python versions.
 - *coverage-finish*: uploads the coverage results to [coveralls.io]
@@ -63,10 +63,10 @@ organization. See [reusing-workflows] for more information.
 
 ### Inputs
 
-- `coveralls`: makes *cargo-test* upload test coverage data to
-  [coveralls.io] when `true`.
-- `deb`: enables *deb* when `true`.
 - `mypy`: disables *mypy* when `false`; mypy is enabled by default.
+- `deb`: enables *deb* when `true`.
+- `coveralls`: makes the *pytest* job upload test coverage data to
+  [coveralls.io] when `true`.
 - `publish_pypi`: enables the *publish-pypi* job.
 - `publish_github_release`: enables the *publish-github-release* job.
 - `publish_github_release_files`: files to publish in the github
