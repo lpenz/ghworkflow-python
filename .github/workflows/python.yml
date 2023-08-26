@@ -118,7 +118,7 @@ jobs:
           python -m venv venv
           source ./venv/bin/activate
           python -m pip install sphinx
-          python -m pip install -e '.[doc]' || true
+          python -m pip install -r docs/requirements.txt || true
           sphinx-build -b html docs/ docs/_build
         if: inputs.docs
       - uses: actions/upload-artifact@v3.1.2
