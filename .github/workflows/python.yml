@@ -110,8 +110,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3.5.0
         if: inputs.docs
+      - uses: actions/setup-python@v4.5.0
+        with:
+          python-version: "3.11"
+        if: inputs.docs
       - run: |
-          docker run --rm -v "${PWD}:${PWD}" -w "$PWD" sphinxdoc/sphinx:5.3.0 make -C docs html
+          python -m venv venv
+          source ./venv/bin/activate
+          python -m pip install sphinx
+          python -m pip install -e '.[doc]' || true
+          sphinx-build -b html docs/ docs/_build
         if: inputs.docs
       - uses: actions/upload-artifact@v3.1.2
         if: inputs.docs
