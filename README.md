@@ -43,7 +43,7 @@ name: CI
 on: [ workflow_dispatch, push, pull_request ]
 jobs:
   python:
-    uses: lpenz/ghworkflow-python/.github/workflows/python.yml@v0.3.4
+    uses: lpenz/ghworkflow-python/.github/workflows/python.yml@v0.4.0
     with:
       coveralls: true
       deb: true
