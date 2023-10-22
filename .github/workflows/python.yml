@@ -83,10 +83,7 @@ jobs:
   install:
     strategy:
       matrix:
-        python-version:
-          - "3.9"
-          - "3.10"
-          - "3.11"
+        python-version: [ "3.9", "3.10", "3.11", "3.12" ]
         include:
           - python-version: "3.11"
             upload: true
@@ -147,10 +144,7 @@ jobs:
   pytest:
     strategy:
       matrix:
-        python-version:
-          - "3.9"
-          - "3.10"
-          - "3.11"
+        python-version: [ "3.9", "3.10", "3.11", "3.12" ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.6.0
