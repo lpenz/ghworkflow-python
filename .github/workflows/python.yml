@@ -228,13 +228,22 @@ jobs:
           path: build
       - name: list all files
         run: find . -type f
-      - name: publish github release
+      - name: publish github release with .deb
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
-        if: steps.version.outputs.version_tagged != ''
+        if: inputs.deb && steps.version.outputs.version_tagged != ''
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: false
           files: |
             deb/*.deb
+            build/*
+            ${{ inputs.publish_github_release_files }}
+      - name: publish github release without .deb
+        uses: "marvinpinto/action-automatic-releases@v1.2.1"
+        if: "!inputs.deb && steps.version.outputs.version_tagged != ''"
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: false
+          files: |
             build/*
             ${{ inputs.publish_github_release_files }}
