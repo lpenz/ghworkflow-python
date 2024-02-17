@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.1
       - id: version
-        uses: docker://lpenz/ghaction-version-gen:0.13.5
+        uses: docker://lpenz/ghaction-version-gen:0.13.6
       - name: publish github release
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
         if: steps.version.outputs.version_tagged != ''
