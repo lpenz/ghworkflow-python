@@ -43,9 +43,10 @@ name: CI
 on: [ workflow_dispatch, push, pull_request ]
 jobs:
   python:
-    uses: lpenz/ghworkflow-python/.github/workflows/python.yml@v0.6.1
+    uses: lpenz/ghworkflow-python/.github/workflows/python.yml@v0.7.0
     with:
       coveralls: true
+      codecov: true
       deb: true
       publish_pypi: true
       publish_github_release: true
@@ -68,6 +69,8 @@ organization. See [reusing-workflows] for more information.
 - `deb`: enables *deb* when `true`.
 - `coveralls`: makes the *pytest* job upload test coverage data to
   [coveralls.io] when `true`.
+- `codecov`: makes the *pytest* job upload test coverage data to
+  [codecov.io] when `true`.
 - `publish_pypi`: enables the *publish-pypi* job.
 - `publish_github_release`: enables the *publish-github-release* job.
 - `publish_github_release_files`: files to publish in the github
@@ -91,3 +94,4 @@ organization. See [reusing-workflows] for more information.
 [packagecloud.io]: https://packagecloud.io/
 [reusing-workflows]: https://docs.github.com/en/actions/using-workflows/reusing-workflows
 [coveralls.io]: https://coveralls.io/
+[codecov.io]: https://codecov.io/
