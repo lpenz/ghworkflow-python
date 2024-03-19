@@ -67,18 +67,18 @@ jobs:
   black:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.2
       - uses: piotrpawlaczek/python-blacken@v22.3.0
   flake8:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.2
       - uses: actions/setup-python@v5.0.0
       - uses: py-actions/flake8@v2.3.0
   mypy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.2
         if: inputs.mypy
       - uses: actions/setup-python@v5.0.0
         if: inputs.mypy
@@ -101,7 +101,7 @@ jobs:
             upload: true
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.2
       - uses: actions/setup-python@v5.0.0
         with:
           python-version: ${{ matrix.python-version }}
@@ -117,7 +117,7 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.2
         if: inputs.docs
       - uses: actions/setup-python@v5.0.0
         with:
@@ -138,11 +138,11 @@ jobs:
   deb:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.2
         if: inputs.deb
       - id: version
         if: inputs.deb
-        uses: docker://lpenz/ghaction-version-gen:0.13.6
+        uses: docker://lpenz/ghaction-version-gen:0.14.0
       - uses: docker://lpenz/ghaction-python-stdeb:0.3
         if: inputs.deb
         with:
@@ -159,7 +159,7 @@ jobs:
         python-version: [ "3.9", "3.10", "3.11", "3.12" ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.2
       - uses: actions/setup-python@v5.0.0
         with:
           python-version: ${{ matrix.python-version }}
@@ -182,7 +182,7 @@ jobs:
           flag-name: python-${{ matrix.python-version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: upload coverage data to codecov
-        uses: codecov/codecov-action@v3.1.6
+        uses: codecov/codecov-action@v4.1.0
         if: inputs.codecov
         with:
           fail_ci_if_error: true
@@ -202,11 +202,11 @@ jobs:
       matrix:
         repository: ${{ fromJson(inputs.publish_packagecloud_repository) }}
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.2
       - id: version
-        uses: docker://lpenz/ghaction-version-gen:0.13.6
+        uses: docker://lpenz/ghaction-version-gen:0.14.0
       - name: download deb
-        uses: actions/download-artifact@v4.1.2
+        uses: actions/download-artifact@v4.1.4
         if: inputs.deb
         with:
           name: deb
@@ -221,12 +221,12 @@ jobs:
     needs: [ black, flake8, mypy, install, docs, deb, pytest ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.2
       - id: version
-        uses: docker://lpenz/ghaction-version-gen:0.13.6
+        uses: docker://lpenz/ghaction-version-gen:0.14.0
       - run: python -m pip install build --user
       - run: python -m build --sdist --wheel --outdir dist/
-      - uses: pypa/gh-action-pypi-publish@v1.8.11
+      - uses: pypa/gh-action-pypi-publish@v1.8.14
         if: steps.version.outputs.version_tagged != ''
         with:
           password: ${{ secrets.PYPI_TOKEN }}
@@ -235,17 +235,17 @@ jobs:
     if: inputs.publish_github_release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.2
       - id: version
-        uses: docker://lpenz/ghaction-version-gen:0.13.6
+        uses: docker://lpenz/ghaction-version-gen:0.14.0
       - name: download deb
-        uses: actions/download-artifact@v4.1.2
+        uses: actions/download-artifact@v4.1.4
         if: inputs.deb
         with:
           name: deb
           path: deb
       - name: download build
-        uses: actions/download-artifact@v4.1.2
+        uses: actions/download-artifact@v4.1.4
         with:
           name: build
           path: build
