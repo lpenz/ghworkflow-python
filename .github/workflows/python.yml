@@ -206,7 +206,7 @@ jobs:
       - id: version
         uses: docker://lpenz/ghaction-version-gen:0.14.0
       - name: download deb
-        uses: actions/download-artifact@v4.1.4
+        uses: actions/download-artifact@v4.1.7
         if: inputs.deb
         with:
           name: deb
@@ -239,13 +239,13 @@ jobs:
       - id: version
         uses: docker://lpenz/ghaction-version-gen:0.14.0
       - name: download deb
-        uses: actions/download-artifact@v4.1.4
+        uses: actions/download-artifact@v4.1.7
         if: inputs.deb
         with:
           name: deb
           path: deb
       - name: download build
-        uses: actions/download-artifact@v4.1.4
+        uses: actions/download-artifact@v4.1.7
         with:
           name: build
           path: build
