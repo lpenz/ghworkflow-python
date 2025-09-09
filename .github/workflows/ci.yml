@@ -1,28 +1,28 @@
 ---
 name: CI
-on: [ workflow_dispatch, push, pull_request ]
+on: [workflow_dispatch, push, pull_request]
 jobs:
   omnilint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v5.0.0
       - uses: docker://lpenz/omnilint:0.5.2
   markdown-link-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.7
-      - uses: gaurav-nelson/github-action-markdown-link-check@1.0.15
+      - uses: actions/checkout@v5.0.0
+      - uses: gaurav-nelson/github-action-markdown-link-check@1.0.17
         with:
-          config-file: '.github/config/mlc_config.json'
+          config-file: .github/config/mlc_config.json
   publish-github-release:
-    needs: [ omnilint, markdown-link-check ]
+    needs: [omnilint, markdown-link-check]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v5.0.0
       - id: version
-        uses: docker://lpenz/ghaction-version-gen:0.14.0
+        uses: docker://lpenz/ghaction-version-gen:0.17.3
       - name: publish github release
-        uses: "marvinpinto/action-automatic-releases@v1.2.1"
+        uses: marvinpinto/action-automatic-releases@v1.2.1
         if: steps.version.outputs.version_tagged != ''
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
