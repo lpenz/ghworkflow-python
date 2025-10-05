@@ -1,6 +1,6 @@
 ---
 name: CI
-on: [workflow_dispatch, push, pull_request]
+on: [workflow_dispatch, push, pull_request]  # yamllint disable-line rule:truthy
 jobs:
   omnilint:
     runs-on: ubuntu-latest
@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5.0.0
       - id: version
-        uses: docker://lpenz/ghaction-version-gen:0.17.3
+        uses: docker://lpenz/ghaction-version-gen:0.17.4
       - name: publish github release
         uses: marvinpinto/action-automatic-releases@v1.2.1
         if: steps.version.outputs.version_tagged != ''
