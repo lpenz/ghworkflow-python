@@ -147,18 +147,38 @@ jobs:
   deb:
     needs: [version]
     runs-on: ubuntu-latest
+    outputs:
+      deb: ${{ steps.pkg.outputs.deb }}
     steps:
       - uses: actions/checkout@v5.0.0
         if: inputs.deb
-      - uses: docker://lpenz/ghaction-python-stdeb:0.3
+      - name: Set .deb information
+        id: pkg
+        run: >
+          set -e -x;
+          deb=${{ needs.version.outputs.deb_basename }}_all.deb;
+          echo "deb=$deb" >> "$GITHUB_ENV";
+          echo "deb=$deb" >> "$GITHUB_OUTPUT";
+      - uses: docker://lpenz/ghaction-python-stdeb:0.4.0
         if: inputs.deb
         with:
           debian_revision: ${{ needs.version.outputs.distance }}
+      - name: Copy deb to top dir
+        if: inputs.deb
+        run: >
+          cp -v ./deb_dist/*.deb ./$deb
+      - name: Show deb information
+        if: inputs.deb
+        run: >
+          set -e -x;
+          find . -name '*.deb';
+          dpkg -I $deb;
+          dpkg -c $deb;
       - uses: actions/upload-artifact@v4.6.2
         if: inputs.deb
         with:
           name: ${{ steps.pkg.outputs.deb }}
-          path: '*.deb'
+          path: ${{ steps.pkg.outputs.deb }}
           if-no-files-found: error
   pytest:
     strategy:
