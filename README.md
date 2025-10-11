@@ -20,7 +20,7 @@ projects. The workflow runs the following jobs:
   wheels to [pypi] when the repository is tagged with a version.
   Requires the `PYPI_TOKEN` secret.
   (optional)
-- *publish-packagecloud*: uses [packagecloud] to upload
+- *publish-packagecloud-deb*: uses [packagecloud] to upload
   the Debian package built by the `deb` job to
   [packagecloud.io] when the repository is tagged with a
   version. Requires the `PACKAGECLOUD_TOKEN` secret and the
@@ -43,15 +43,14 @@ name: CI
 on: [ workflow_dispatch, push, pull_request ]
 jobs:
   python:
-    uses: lpenz/ghworkflow-python/.github/workflows/python.yml@v0.8.2
+    uses: lpenz/ghworkflow-python/.github/workflows/python.yml@v0.10.0
     with:
       coveralls: true
       codecov: true
       deb: true
       publish_pypi: true
       publish_github_release: true
-      publish_packagecloud: true
-      publish_packagecloud_repository: |
+      publish_packagecloud_repository_deb: |
         ["debian/debian/bullseye", "ubuntu/ubuntu/focal"]
     secrets:
       PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
@@ -75,9 +74,8 @@ organization. See [reusing-workflows] for more information.
 - `publish_github_release`: enables the *publish-github-release* job.
 - `publish_github_release_files`: files to publish in the github
   release.
-- `publish_packagecloud`: enables the *publish-packagecloud* job.
-- `publish_packagecloud_repository`: json list with packagecloud
-  repositories to publish .deb.
+- `publish_packagecloud_repository_deb`: json list with packagecloud
+  repositories to publish .deb. Disables .deb publishing if empty.
 
 
 [black]: https://github.com/psf/black
